@@ -1,17 +1,102 @@
 // Copyright (c) 2021 by Fernando (https://codepen.io/webfoxcore/pen/jqzJBB)
 
-var gottenEle = document.querySelectorAll("li"),
-  gottenpopup = document.getElementById("pop-up"),
-  popuptoggled = false;
+const popUpBox = document.querySelector("#pop-up");
+const textInput = document.querySelector("input");
+const toDoContainer = document.querySelector("#to-do-container");
 
-var testfun = function () {
-  var r = 72,
+let isShowPopUpBox = false;
+
+textInput.addEventListener("keypress", insertToDo);
+toDoContainer.addEventListener("click", toDoHandler);
+
+drowColorfulToDo(document.querySelectorAll("li"));
+drowColorfulDeleteBtn(document.querySelectorAll(".delete"));
+
+function insertToDo(e) {
+  if (e.key === "Enter") {
+    const description = this.value;
+    if (description == "") {
+      return showPopUpBox("warning");
+    }
+    this.value = "";
+
+    todo = document.createElement("li");
+    todo.innerHTML = `<span class="delete"><i class="fa fa-trash" aria-hidden="true"></i></span>${description}`;
+    toDoContainer.appendChild(todo);
+
+    drowColorfulToDo(document.querySelectorAll("li"));
+    showPopUpBox("added");
+    drowColorfulDeleteBtn(document.querySelectorAll(".delete"));
+  }
+}
+
+function showPopUpBox(message) {
+  if (!isShowPopUpBox) {
+    if (message === "warning") {
+      popUpBox.style.opacity = "100";
+      popUpBox.style.height = "50px";
+      popUpBox.style.color = "red";
+      popUpBox.textContent = "To-do를 입력해주세요!";
+      isShowPopUpBox = true;
+      setTimeout(togglePopUpBox, 1000);
+    } else if (message === "added") {
+      popUpBox.style.color = "#FFF";
+      popUpBox.style.opacity = "100";
+      popUpBox.style.height = "50px";
+      popUpBox.textContent = "To-do가 등록되었습니다!";
+      isShowPopUpBox = true;
+      setTimeout(togglePopUpBox, 1000);
+    } else {
+      console.log("WARNING");
+    }
+  }
+}
+
+function togglePopUpBox() {
+  if (!isShowPopUpBox) {
+    popUpBox.style.opacity = "100";
+    popUpBox.style.height = "200px";
+    isShowPopUpBox = true;
+  } else {
+    popUpBox.style.opacity = "0";
+    popUpBox.style.height = "0px";
+    isShowPopUpBox = false;
+  }
+}
+
+function toDoHandler(e) {
+  const target = e.target;
+  if (target.tagName === "LI") target.classList.toggle("marked");
+  else if (target.tagName === "SPAN") {
+    fadeOut(target.parentNode);
+    e.stopPropagation();
+  } else if (target.tagName === "I") {
+    fadeOut(target.parentNode.parentNode);
+    e.stopPropagation();
+  }
+}
+
+function fadeOut(el) {
+  el.style.opacity = 1;
+
+  (function fade() {
+    if ((el.style.opacity -= 0.05) < 0) {
+      el.style.display = "none";
+    } else {
+      requestAnimationFrame(fade);
+    }
+  })();
+}
+
+function drowColorfulToDo(toDo) {
+  let r = 72,
     b = 85,
     g = 99,
     a = 0.5,
     gswitch = false;
-  for (var i = 0; i < gottenEle.length; i++) {
-    gottenEle[i].style.background =
+
+  for (let i = 0; i < toDo.length; i++) {
+    toDo[i].style.background =
       "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
     if (!gswitch) {
       if (b < 255) {
@@ -31,17 +116,17 @@ var testfun = function () {
       }
     }
   }
-};
+}
 
-var testfun2 = function () {
-  var gottenEle2 = document.querySelectorAll(".delete"),
-    r2 = 255,
+function drowColorfulDeleteBtn(toDo) {
+  let r2 = 255,
     b2 = 0,
     g2 = 0,
     a2 = 0.5,
     gswitch2 = false;
-  for (var i = 0; i < gottenEle2.length; i++) {
-    gottenEle2[i].style.background =
+
+  for (let i = 0; i < toDo.length; i++) {
+    toDo[i].style.background =
       "rgba(" + r2 + ", " + g2 + ", " + b2 + ", " + a2 + ")";
     if (!gswitch2) {
       if (g2 < 255) {
@@ -57,77 +142,4 @@ var testfun2 = function () {
       }
     }
   }
-};
-
-$("input[type=text]").keypress(function (e) {
-  if (event.which === 13) {
-    var inputted = $(this).val();
-    if (inputted == "") {
-      return visib("warning");
-    }
-    $(this).val("");
-    $("ul").append(
-      "<li><span class = 'delete'><i class=\"fa fa-trash\"></i></span>" +
-        inputted +
-        "</li>"
-    );
-    gottenEle = document.querySelectorAll("li");
-    testfun();
-    visib("added");
-    testfun2();
-  }
-});
-
-var visib = function (e) {
-  if (!popuptoggled) {
-    if (e === "warning") {
-      gottenpopup.style.opacity = "100";
-      gottenpopup.style.height = "50px";
-      gottenpopup.style.color = "red";
-      gottenpopup.textContent = "Please enter a to-do event!";
-      popuptoggled = true;
-      setTimeout(OpenPU, 4000);
-    } else if (e === "added") {
-      gottenpopup.style.color = "#FFF";
-      gottenpopup.style.opacity = "100";
-      gottenpopup.style.height = "50px";
-      gottenpopup.textContent = "To-do event added!";
-      popuptoggled = true;
-      setTimeout(OpenPU, 4000);
-    } else {
-      console.log("WARNING");
-    }
-  }
-};
-
-var OpenPU = function () {
-  if (!popuptoggled) {
-    gottenpopup.style.opacity = "100";
-    gottenpopup.style.height = "200px";
-    popuptoggled = true;
-  } else {
-    gottenpopup.style.opacity = "0";
-    gottenpopup.style.height = "0px";
-    popuptoggled = false;
-  }
-};
-
-$("ul").on("click", "li", function () {
-  $(this).toggleClass("marked");
-});
-
-$("ul").on("click", "span", function (e) {
-  $(this)
-    .parent()
-    .fadeOut(500, function () {
-      $(this).remove();
-    });
-  e.stopPropagation();
-});
-
-$(".fa-plus").click(function () {
-  $("input[type='text']").fadeToggle();
-});
-
-testfun();
-testfun2();
+}
